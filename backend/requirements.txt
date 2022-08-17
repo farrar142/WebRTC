@@ -1,4 +1,5 @@
 django
+mysqlclient
 django-ninja
 django-redis
 celery==5.2.3
@@ -7,7 +8,6 @@ django-celery-beat
 redis
 channels
 channels_redis
-mysqlclient
 requests
 unidecode
 django-extensions
