@@ -1,0 +1,7 @@
+hi
+<script>
+  const websocket = new WebSocket("ws://localhost:8001/ws/test/test/");
+  websocket.onopen = (e) => {
+    console.log(e);
+  };
+</script>
