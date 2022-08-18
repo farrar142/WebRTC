@@ -22,11 +22,9 @@ services:
     build:
       context: ./backend
       dockerfile: dockerfile
-    command: 'sh command.sh ${BACK_PORT}'
+    command: 'sh deploy.sh'
     container_name: ${BACK_NAME}
     hostname: root
-    volumes:
-      - ./backend:/usr/src/app
     ports:
       - '${BACK_PORT}:8000'
     restart: unless-stopped
