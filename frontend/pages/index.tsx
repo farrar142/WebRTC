@@ -4,10 +4,11 @@ import axios from "axios";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
+import { InputTextField } from "../components/CssTextField";
 
 export const API_BASE = `https://webrtcbackend.honeycombpizza.link/api`;
 
-const Room: NextPage = (props) => {
+const Room: NextPage = () => {
   const [roomname, setRoomname] = useState<string>("test");
   const router = useRouter();
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -30,7 +31,7 @@ const Room: NextPage = (props) => {
         width: "100vw",
       }}
     >
-      <TextField
+      <InputTextField
         label="roomname"
         placeholder="roomname"
         onChange={(e) => {

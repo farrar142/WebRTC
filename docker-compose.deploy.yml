@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+  next:
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://172.17.0.1:${FRONT_PORT}']
+      interval: 1s
+      retries: 30
+      start_period: 60s
+    build:
+      context: ./frontend
+      dockerfile: deploy.dockerfile
+    container_name: ${FRONT_NAME}
+    user: root
+    entrypoint: sh deploy.sh
+    ports:
+      - ${FRONT_PORT}:3000
+    restart: unless-stopped
+    # cpus: .10
+    # mem_limit: "512M"
+
+  django:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    command: 'sh command.sh ${BACK_PORT}'
+    container_name: ${BACK_NAME}
+    hostname: root
+    volumes:
+      - ./backend:/usr/src/app
+    ports:
+      - '${BACK_PORT}:8000'
+    restart: unless-stopped
