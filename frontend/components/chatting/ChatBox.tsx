@@ -310,16 +310,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
               label="메시지 입력"
               autoComplete="off"
             />
-            <Button type="submit" sx={{ display: "none" }} />
-            <Button
-              onClick={() => {
-                if (ws) {
-                  ws.close();
-                }
-              }}
-            >
-              테스트
-            </Button>
+            <Button type="submit">보내기</Button>
           </Box>
         </Box>
       </SwipeableDrawer>
