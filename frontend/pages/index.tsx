@@ -25,6 +25,7 @@ const Room: NextPage = () => {
       component="form"
       onSubmit={handleSubmit}
       style={{
+        paddingTop: 10,
         backgroundColor: "black",
         height: "100vh",
         width: "100vw",
