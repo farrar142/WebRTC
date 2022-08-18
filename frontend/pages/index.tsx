@@ -20,7 +20,16 @@ const Room: NextPage = (props) => {
     });
   };
   return (
-    <Box component="form" onSubmit={handleSubmit} style={{ marginTop: 10 }}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      style={{
+        marginTop: 10,
+        backgroundColor: "black",
+        height: "100vh",
+        width: "100vw",
+      }}
+    >
       <TextField
         label="roomname"
         placeholder="roomname"

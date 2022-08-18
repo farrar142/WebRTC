@@ -95,7 +95,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 HOST = os.getenv("DB_HOST")
 USER = os.getenv("DB_USER")
 PASSWORD = os.getenv("DB_PASSWORD")
-
+print(HOST,USER,PASSWORD)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',

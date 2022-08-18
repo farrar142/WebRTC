@@ -35,8 +35,9 @@ class Room:
             cache.set(self.room_name, self.room)
 
     def is_participated_by_name(self, user_name: str):
-        for participant in self.room['participants']:
-            target = participant.get(user_name)
+        for key in self.room['participants']:
+            print(key)
+            target = self.room['participants'][key].get(user_name)
             if target and target.get("user_name") == user_name:
                 return True
         return False
