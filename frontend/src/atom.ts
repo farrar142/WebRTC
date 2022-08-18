@@ -1,4 +1,3 @@
-import { User } from "./../pages/[room]";
 import { useEffect } from "react";
 
 import {
@@ -10,6 +9,7 @@ import {
   useSetRecoilState,
 } from "recoil";
 import { recoilPersist } from "recoil-persist";
+import { User } from "../types/video";
 const { persistAtom } = recoilPersist();
 const ssrCompletedState = atom({
   key: "SsrCompleted",
