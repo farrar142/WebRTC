@@ -37,7 +37,7 @@ class Room:
     def is_participated_by_name(self, user_name: str):
         for key in self.room['participants']:
             print(key)
-            target = self.room['participants'][key].get(user_name)
+            target = self.room['participants'][key]
             if target and target.get("user_name") == user_name:
                 return True
         return False
