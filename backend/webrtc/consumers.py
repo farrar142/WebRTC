@@ -200,6 +200,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
             unidecode(self.room_group_name),
             self.channel_name
         )
+        text_data_json:WebSocketRequestParams={
+            "order": "prev_chats",
+            "sender_on_stream":{
+                "audio":False,"video":False
+            },
+            "sender_name":"",
+            "sender":self.user_id,
+            "receiver":0,
+            "request_source":"audio",
+            "data":self.room.getChat()
+        }
+        
+        await self.emit({"data":text_data_json})
 
     async def disconnect(self, close_code):
         # Leave room group

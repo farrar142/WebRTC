@@ -35,8 +35,8 @@ class Participant(TypedDict):
     on_stream:OnStream
 
 class ChatItem(TypedDict):
-    user_id:int
-    user_name:str
+    sender:int
+    sender_name:str
     message:str
 class RoomInformation(TypedDict):
     participants : dict[int,Participant]
@@ -93,8 +93,8 @@ class Room(RoomBase):
         if chat_length>100:
             self.room['chats'] = self.room['chats'][chat_length-100:-1]
         self.room['chats'].append({
-            "user_id":user_id,
-            "user_name":user_name,
+            "sender":user_id,
+            "sender_name":user_name,
             "message":message
         })
         self.save()
