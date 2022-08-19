@@ -53,7 +53,8 @@ export type wsRecivedOrder =
   | 'get_offer'
   | 'get_answer'
   | 'get_candidate'
-  | 'user_infos';
+  | 'user_infos'
+  | 'prev_chats';
 export type ChatType = {
   sender: number;
   sender_name: string;
