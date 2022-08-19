@@ -9,24 +9,24 @@ import {
   SwipeableDrawer,
   TextField,
   Typography,
-} from "@mui/material";
-import { useRouter } from "next/router";
+} from '@mui/material';
+import { useRouter } from 'next/router';
 import {
   FormEventHandler,
   UIEventHandler,
   useEffect,
   useRef,
   useState,
-} from "react";
-import { BASE } from "../../src/urls";
+} from 'react';
+import { BASE } from '../../src/urls';
 import {
   ChatType,
   StreamSources,
   User,
   WsMessage,
   WsOrder,
-} from "../../types/video";
-import { InputTextField } from "../CssTextField";
+} from '../../types/video';
+import { InputTextField } from '../CssTextField';
 type ChatBoxProps = {
   me: User;
 };
@@ -56,11 +56,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
     ws.onclose = () => {
       const reConnect = () => {
         const timeout = setTimeout(() => {
-          console.log("챗소켓 재연결중");
+          console.log('챗소켓 재연결중');
           const _ws = new WebSocket(WS_BASE);
           _ws.onopen = () => {
             setWs(_ws);
-            console.log("챗소켓연결됨!");
+            console.log('챗소켓연결됨!');
             clearTimeout(timeout);
           };
           _ws.onclose = () => {
@@ -74,17 +74,20 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
     ws.onmessage = (e: MessageEvent) => {
       const message = JSON.parse(e.data) as WsMessage;
       const order = message.order;
+      console.log(message);
       switch (order) {
-        case "send_message":
+        case 'send_message':
           onReceiveChat(message);
           return;
+        case 'prev_chats':
+          onLoadChat(message);
       }
     };
   }, [ws]);
   const wsMessage = (
     target_id: number,
     order: WsOrder,
-    data: any = "",
+    data: any = '',
     request_source: keyof StreamSources
   ) => {
     const msg = {
@@ -106,17 +109,26 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
   const sendChat = (e: React.FormEvent<HTMLFormElement>): boolean => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
-    const message = form.get("chat");
+    const message = form.get('chat');
     e.currentTarget.reset();
     if (message) {
-      wsMessage(0, "send_message", message, "video");
+      wsMessage(0, 'send_message', message, 'video');
     }
     return message ? true : false;
   };
 
+  const onLoadChat = ({ sender, sender_name, data }: WsMessage) => {
+    setChats([...chatRef.current, ...data]);
+    checkScroll();
+  };
+
   const onReceiveChat = ({ sender, sender_name, data }: WsMessage) => {
     setChats([...chatRef.current, { sender, sender_name, message: data }]);
-    const el = document.getElementById("chatField");
+    checkScroll();
+  };
+
+  const checkScroll = () => {
+    const el = document.getElementById('chatField');
     if (el) {
       const 마지막차일드 = el.lastElementChild;
       const 채팅크기 = 마지막차일드?.clientHeight || 0;
@@ -127,20 +139,21 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
       if (대상값 + 채팅크기 * 10 >= 전체크기) {
         el.scrollTop = el.scrollHeight;
       } else {
-        console.log("스크롤을 내릴까요?");
+        console.log('스크롤을 내릴까요?');
         if (chatScroll === false) {
           setChatScroll(true);
         }
       }
     }
   };
+
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
       if (
         event &&
-        event.type === "keydown" &&
-        ((event as React.KeyboardEvent).key === "Tab" ||
-          (event as React.KeyboardEvent).key === "Shift")
+        event.type === 'keydown' &&
+        ((event as React.KeyboardEvent).key === 'Tab' ||
+          (event as React.KeyboardEvent).key === 'Shift')
       ) {
         return;
       }
@@ -148,35 +161,35 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
       setShow(open);
     };
   const handleChat = (e: React.FormEvent<HTMLFormElement>) => {
-    const el = document.getElementById("chatField");
+    const el = document.getElementById('chatField');
     if (sendChat(e) && el) {
       const height = el.scrollHeight;
       el.scrollTop = height;
-      console.log("scroll!");
+      console.log('scroll!');
     }
   };
   const onScroll = () => {
-    const el = document.getElementById("chatField");
+    const el = document.getElementById('chatField');
   };
   return (
     <>
       <Box
-        id={"chatBoxOpen"}
+        id={'chatBoxOpen'}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           left: 0,
-          height: "100vh",
-          width: "5%",
-          display: "flex",
-          alignItems: "center",
+          height: '100vh',
+          width: '5%',
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
         <Button
           onClick={toggleDrawer(true)}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             // left: show ? 350 : 0,
-            transition: "left 300ms, right 300ms",
+            transition: 'left 300ms, right 300ms',
             zIndex: 50,
           }}
         >
@@ -184,11 +197,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
         </Button>
       </Box>
       <SwipeableDrawer
-        anchor="left"
+        anchor='left'
         open={show}
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
-        sx={{ cursor: "default" }}
+        sx={{ cursor: 'default' }}
         disableBackdropTransition={true}
         disableDiscovery={true}
       >
@@ -197,27 +210,27 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
           // onKeyDown={toggleDrawer(false)}
           sx={{
             width: 350,
-            height: "100% ",
+            height: '100% ',
             // position: "absolute",
             zIndex: 200,
             top: 0,
             left: 0,
             backgroundColor: colors.grey[900],
-            transition: "background 300ms, color 300ms, visibility 300ms",
-            cursor: "default",
+            transition: 'background 300ms, color 300ms, visibility 300ms',
+            cursor: 'default',
           }}
         >
-          <Box sx={{ padding: 2, height: "10%" }}>
-            <Typography variant="h5" color="white">
+          <Box sx={{ padding: 2, height: '10%' }}>
+            <Typography variant='h5' color='white'>
               Chatting
             </Typography>
           </Box>
           <Box
-            id="chatField"
+            id='chatField'
             onScroll={onScroll}
             sx={{
-              overflow: "scroll",
-              height: "75%",
+              overflow: 'scroll',
+              height: '75%',
               paddingX: 2,
               marginBottom: 2,
             }}
@@ -230,23 +243,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
                 <Box
                   key={index}
                   sx={{
-                    width: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: isMine ? "flex-end" : "flex-start",
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: isMine ? 'flex-end' : 'flex-start',
                     margin: 1,
                   }}
                 >
                   <Box
                     sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: isMine ? "flex-end" : "flex-start",
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: isMine ? 'flex-end' : 'flex-start',
                     }}
                   >
                     {first && !isMine && (
                       <Box>
-                        <Typography color="white">
+                        <Typography color='white'>
                           {chat.sender_name}
                         </Typography>
                       </Box>
@@ -254,13 +267,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
                     <Box
                       style={{
                         backgroundColor: colors.grey[600],
-                        borderRadius: "10%",
+                        borderRadius: '10%',
                         padding: 1,
                       }}
                     >
                       <Typography
                         sx={{ marginX: 1, marginY: 0.5 }}
-                        color="white"
+                        color='white'
                       >
                         {chat.message}
                       </Typography>
@@ -271,29 +284,29 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
             })}
           </Box>
           <Box
-            id="chatInput"
-            component="form"
+            id='chatInput'
+            component='form'
             onSubmit={handleChat}
             sx={{
-              width: "100%",
-              height: "10%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              position: "absolute",
+              width: '100%',
+              height: '10%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'absolute',
               bottom: 20,
               padding: 2,
             }}
           >
             <Box
               sx={{
-                display: chatScroll ? "block" : "none",
-                position: "absolute",
+                display: chatScroll ? 'block' : 'none',
+                position: 'absolute',
                 bottom: 80,
-                cursor: "pointer",
+                cursor: 'pointer',
               }}
               onClick={() => {
-                const el = document.getElementById("chatField");
+                const el = document.getElementById('chatField');
                 if (el) {
                   el.scrollTop = el.scrollHeight;
                   setChatScroll(false);
@@ -304,13 +317,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ me }) => {
             </Box>
             <InputTextField
               // variant="filled"
-              color="primary"
-              id="chat"
-              name="chat"
-              label="메시지 입력"
-              autoComplete="off"
+              color='primary'
+              id='chat'
+              name='chat'
+              label='메시지 입력'
+              autoComplete='off'
             />
-            <Button type="submit">보내기</Button>
+            <Button type='submit'>보내기</Button>
           </Box>
         </Box>
       </SwipeableDrawer>
