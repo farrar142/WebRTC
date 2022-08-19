@@ -1,8 +1,9 @@
 # chat/consumers.py
 import json
+from typing import Any, Literal, TypeVar, TypedDict
 from unidecode import unidecode
 from channels.generic.websocket import AsyncWebsocketConsumer
-from base.utils import Room
+from base.utils import Room,OnStream
 roomExample = {
     "test": {
         "sandring": {
@@ -10,11 +11,23 @@ roomExample = {
         }
     }
 }
-
-
+class WebSocketRequestParams(TypedDict):
+    order:str
+    sender_on_stream:OnStream
+    sender_name:str
+    sender:int
+    receiver:int
+    request_source:Literal["audio", "video"]
+    data:Any
 class RTCConsumer(AsyncWebsocketConsumer):
-    instances = {}
-
+    instances:dict[int,Any] = {}
+    user_id:int
+    user_name:str
+    instance_id:int
+    room_group_name:str
+    room_name:str
+    room:Room
+    
     async def leave_room(self):
         self.room.leave(self.user_id)
         await self.channel_layer.group_send(
@@ -49,7 +62,7 @@ class RTCConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-    async def disconnect(self, close_code):
+    async def disconnect(self, close_code:Any):
         # Leave room group
         await self.leave_room()
         await self.channel_layer.group_discard(
@@ -59,7 +72,7 @@ class RTCConsumer(AsyncWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
+        text_data_json:WebSocketRequestParams = json.loads(text_data)
         order = text_data_json['order']
         receiver = text_data_json['receiver']
         sender_name = text_data_json['sender_name']
@@ -133,10 +146,10 @@ class RTCConsumer(AsyncWebsocketConsumer):
                 }
             )
 
-    def save_instance(self, id):
+    def save_instance(self, id:int):
         self.instances[id] = self
 
-    def get_instance(self, id):
+    def get_instance(self, id:int):
         return self.instances[id]
 
     def my_info(self, user_name):
@@ -168,11 +181,19 @@ class RTCConsumer(AsyncWebsocketConsumer):
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    instances = {}
+    room_name:str
+    user_id:int
+    instance_id:int
+    room_group_name:str
+    room:Room
+    
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.user_id = int(self.scope['url_route']['kwargs']['user_id'])
         self.instance_id = self.user_id
         self.room_group_name = u'chat_%s' % unidecode(self.room_name)
+        self.room = Room(self.room_name)
         await self.accept()
         # Join room group
         await self.channel_layer.group_add(
@@ -189,13 +210,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
+        text_data_json:WebSocketRequestParams = json.loads(text_data)
         order = text_data_json['order']
         receiver = text_data_json['receiver']
         sender_name = text_data_json['sender_name']
         sender_on_stream = text_data_json['sender_on_stream']
         sender_id = text_data_json['sender']
         request_source = text_data_json['request_source']
+        data = text_data_json['data']
+        self.room.chat(sender_id,sender_name,data)
         await self.channel_layer.group_send(
             self.room_group_name, {
                 "type": "emit",
@@ -217,7 +240,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({**datas}))
 
     async def emit(self, event):
-        data = event['data']
+        data:WebSocketRequestParams = event['data']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
